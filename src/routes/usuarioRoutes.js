@@ -1,6 +1,39 @@
 const express = require('express');
 const router = express.Router();
 const Usuario = require('../models/usuarioModel');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+// Rota de login
+router.post('/login', async (req, res) => {
+    try {
+        const { email, senha } = req.body;
+
+        // Verifica se usuário existe
+        const usuario = await Usuario.findOne({ email });
+        if (!usuario) {
+            return res.status(404).json({ erro: 'Usuário não encontrado' });
+        }
+
+        // Verifica senha
+        const senhaValida = await bcrypt.compare(senha, usuario.senha);
+        if (!senhaValida) {
+            return res.status(401).json({ erro: 'Senha incorreta' });
+        }
+
+        // Gera token JWT
+        const token = jwt.sign(
+            { id: usuario._id, nome: usuario.nome },
+            process.env.JWT_SECRET || 'segredo',
+            { expiresIn: '1h' }
+        );
+
+        res.status(200).json({ token, usuario: { _id: usuario._id, nome: usuario.nome, email: usuario.email } });
+
+    } catch (err) {
+        res.status(500).json({ erro: 'Erro interno do servidor', detalhes: err.message });
+    }
+});
 
 // Rota para listar todos os usuários
 router.get('/', async (req, res) => {
