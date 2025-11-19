@@ -32,6 +32,18 @@ const usuarioSchema = new mongoose.Schema({
   timestamps: true // Cria createdAt e updatedAt automaticamente
 });
 
+// Antes de salvar, criptografa a senha
+usuarioSchema.pre('save', async function(next) {
+  if (!this.isModified('senha')) return next(); // só criptografa se a senha foi alterada
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.senha = await bcrypt.hash(this.senha, salt);
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 //  MIDDLEWARE: Criptografa senha antes de atualizar (se a senha foi modificada)
 usuarioSchema.pre('findOneAndUpdate', async function(next) {
   const update = this.getUpdate();

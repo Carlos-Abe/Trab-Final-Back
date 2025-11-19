@@ -16,12 +16,14 @@ app.use(cookieParser());
 const routes = require('./src/routes/index');
 const usuarioRoutes = require('./src/routes/usuarioRoutes');
 const authRoutes = require('./src/routes/authRoutes');
+const tarefaRoutes = require('./src/routes/tarefaRoutes');  // Issue 04
 
 
 //middleware de rotas
 app.use('/api', routes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/auth', authRoutes);	
+app.use('/api/tarefas', tarefaRoutes);                      // Isue 04
 
 
 module.exports = app;
