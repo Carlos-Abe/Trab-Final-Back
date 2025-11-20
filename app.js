@@ -17,6 +17,8 @@ const routes = require('./src/routes/index');
 const usuarioRoutes = require('./src/routes/usuarioRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const tarefaRoutes = require('./src/routes/tarefaRoutes');
+const projetoRoutes = require('./src/routes/projetoRoutes');
+
 const errorHandler = require('./src/middlewares/errorHandler');
 
 //middleware de rotas
@@ -24,6 +26,8 @@ app.use('/api', routes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/tarefas', tarefaRoutes);
+app.use('/api/projetos', projetoRoutes);
+
 app.use(errorHandler);
 
 module.exports = app;
