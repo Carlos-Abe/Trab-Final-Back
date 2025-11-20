@@ -1,0 +1,409 @@
+openapi: 3.0.0
+info:
+  title: FreeTech API
+  version: 1.0.0
+  description: API para gerenciamento de freelancers, projetos, usuários e tarefas
+  contact:
+    name: Suporte FreeTech
+    email: suporte@freetech.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3002
+    description: Servidor local de desenvolvimento
+  - url: https://api.freetech.com
+    description: Servidor de produção
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    Usuario:
+      type: object
+      required:
+        - nome
+        - email
+        - senha
+      properties:
+        nome:
+          type: string
+          example: "João Silva"
+        email:
+          type: string
+          example: "joao@email.com"
+        senha:
+          type: string
+          example: "123456"
+
+    AuthLogin:
+      type: object
+      required:
+        - email
+        - senha
+      properties:
+        email:
+          type: string
+          example: "joao@email.com"
+        senha:
+          type: string
+          example: "123456"
+
+    Freelancer:
+      type: object
+      required:
+        - nome
+        - especialidade
+      properties:
+        nome:
+          type: string
+          example: "Maria Souza"
+        especialidade:
+          type: string
+          example: "Desenvolvedora Backend"
+        valorHora:
+          type: number
+          example: 120
+
+    Projeto:
+      type: object
+      required:
+        - nome
+        - cliente
+        - prazo
+      properties:
+        nome:
+          type: string
+          example: "Sistema de Gestão"
+        cliente:
+          type: string
+          example: "Empresa XPTO"
+        prazo:
+          type: string
+          format: date
+          example: "2025-01-10"
+        descricao:
+          type: string
+          example: "Desenvolvimento de um sistema web completo."
+
+    Tarefa:
+      type: object
+      required:
+        - titulo
+        - prazo
+        - projeto
+      properties:
+        titulo:
+          type: string
+          example: "Criar endpoint de autenticação"
+        descricao:
+          type: string
+          example: "Desenvolver rota de login com JWT"
+        prazo:
+          type: string
+          format: date
+          example: "2025-01-15"
+        status:
+          type: string
+          enum: [pendente, em_andamento, concluida]
+          example: "pendente"
+        projeto:
+          type: string
+          example: "677a8fa92b3f4c001c3c1e02"
+
+paths:
+
+  /:
+    get:
+      summary: Rota raiz da API
+      tags: [Geral]
+      security: []
+      responses:
+        '200':
+          description: API online e funcionando
+
+  # -------- AUTENTICAÇÃO --------
+  /api/auth/registrar:
+    post:
+      summary: Registrar novo usuário
+      tags: [Autenticação]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '201':
+          description: Usuário registrado com sucesso
+
+  /api/auth/login:
+    post:
+      summary: Login do usuário
+      tags: [Autenticação]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthLogin'
+      responses:
+        '200':
+          description: Login bem-sucedido
+
+  # -------- USUÁRIOS --------
+  /api/usuarios:
+    get:
+      summary: Listar usuários
+      tags: [Usuários]
+      security: []
+      responses:
+        '200':
+          description: Lista de usuários
+
+    post:
+      summary: Criar novo usuário
+      tags: [Usuários]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '201':
+          description: Usuário criado
+
+    put:
+      summary: Atualizar usuário
+      tags: [Usuários]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '200':
+          description: Usuário atualizado
+
+    delete:
+      summary: Deletar usuário
+      tags: [Usuários]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Usuário deletado
+
+  # -------- FREELANCERS --------
+  /api/freelancers:
+    get:
+      summary: Listar freelancers
+      tags: [Freelancers]
+      security: []
+      responses:
+        '200':
+          description: Lista de freelancers
+
+    post:
+      summary: Criar freelancer
+      tags: [Freelancers]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Freelancer'
+      responses:
+        '201':
+          description: Freelancer criado
+
+  /api/freelancers/{id}:
+    get:
+      summary: Obter freelancer por ID
+      tags: [Freelancers]
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Freelancer encontrado
+
+    put:
+      summary: Atualizar freelancer
+      tags: [Freelancers]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Freelancer'
+      responses:
+        '200':
+          description: Freelancer atualizado
+
+    delete:
+      summary: Deletar freelancer
+      tags: [Freelancers]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Freelancer deletado
+
+  # -------- PROJETOS --------
+  /api/projetos:
+    get:
+      summary: Listar projetos
+      tags: [Projetos]
+      security: []
+      responses:
+        '200':
+          description: Lista de projetos
+
+    post:
+      summary: Criar projeto
+      tags: [Projetos]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Projeto'
+      responses:
+        '201':
+          description: Projeto criado
+
+  /api/projetos/{id}:
+    get:
+      summary: Obter projeto por ID
+      tags: [Projetos]
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Projeto encontrado
+
+    put:
+      summary: Atualizar projeto
+      tags: [Projetos]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Projeto'
+      responses:
+        '200':
+          description: Projeto atualizado
+
+    delete:
+      summary: Deletar projeto
+      tags: [Projetos]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Projeto removido
+
+  # -------- TAREFAS --------
+  /api/tarefas:
+    get:
+      summary: Listar todas as tarefas
+      tags: [Tarefas]
+      security: []
+      responses:
+        '200':
+          description: Lista de tarefas
+
+    post:
+      summary: Criar tarefa
+      tags: [Tarefas]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tarefa'
+      responses:
+        '201':
+          description: Tarefa criada
+
+  /api/tarefas/{id}:
+    get:
+      summary: Obter tarefa por ID
+      tags: [Tarefas]
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tarefa encontrada
+
+    put:
+      summary: Atualizar tarefa
+      tags: [Tarefas]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tarefa'
+      responses:
+        '200':
+          description: Tarefa atualizada
+
+    delete:
+      summary: Deletar tarefa
+      tags: [Tarefas]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tarefa excluída
+
+tags:
+  - name: Geral
+  - name: Autenticação
+  - name: Usuários
+  - name: Freelancers
+  - name: Projetos
+  - name: Tarefas
