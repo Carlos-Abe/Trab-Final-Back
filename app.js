@@ -18,6 +18,7 @@ const usuarioRoutes = require('./src/routes/usuarioRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const tarefaRoutes = require('./src/routes/tarefaRoutes');
 const projetoRoutes = require('./src/routes/projetoRoutes');
+const freelancerRoutes = require('./src/routes/freelancerRoutes');
 
 const errorHandler = require('./src/middlewares/errorHandler');
 
@@ -27,6 +28,7 @@ app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/tarefas', tarefaRoutes);
 app.use('/api/projetos', projetoRoutes);
+app.use('/api/freelancers', freelancerRoutes);
 
 app.use(errorHandler);
 
