@@ -251,13 +251,14 @@ A seguir estão exemplos reais de requisições e respostas dos principais endpo
 Eles podem ser utilizados no Postman, Insomnia, Thunder Client ou diretamente pelo Swagger. Neste projeto foi utilizado especificamente a extensão Postman do VSCode
 1. Registrar Usuário
 
-    POST /api/usuarios/register
+    POST /api/auth/registrar
     Body
     ```json
     {
         "nome": "Ana Silva",
         "email": "ana@mail.com",
-        "senha": "123456"
+        "senha": "123456",
+        "perfil": "freelancer"
     }
     ```
     Resposta
@@ -271,7 +272,7 @@ Eles podem ser utilizados no Postman, Insomnia, Thunder Client ou diretamente pe
    
    Requisição
 
-   POST /api/usuarios/login
+   POST /api/auth/login
 
    Body
    ```json
@@ -290,7 +291,55 @@ Eles podem ser utilizados no Postman, Insomnia, Thunder Client ou diretamente pe
 
     Authorization: Bearer SEU_TOKEN
 
-3. Criar Tarefa
+3. Atualizar usuário
+
+   Requisição
+
+   PUT / api/usuarios/:id
+
+    Body
+   ```json
+    {        
+        "nome": "Ana Silva Souza",
+        "email": "ana.souza@mail.com",
+        "senha": "novaSenha123",
+        "perfil": "freelancer
+    }
+    ```
+    Resposta
+     ```json
+    {
+        "mensagem": "Usuário atualizado com sucesso",
+        "usuario": {
+            "_id": "691fcfba9634454da4340a23",
+            "nome": "Ana Silva Souza",
+            "email": "ana.souza@mail.com",
+            "perfil": "freelancer"
+        }
+    }
+    ```
+
+4. Excluir usuário (DELETAR)
+
+   Requisição
+
+   PUT / api/usuarios/:id
+
+   Authorization: Bearer SEU_TOKEN
+
+   Body
+
+   Não é necessário enviar body, apenas o ID no endpoint.
+
+   Resposta
+
+     ```json
+    {
+        "mensagem": "Usuário deletado com sucesso"
+    }
+    ```
+
+5. Criar Tarefa
 
    Requisição
 
@@ -323,7 +372,7 @@ Eles podem ser utilizados no Postman, Insomnia, Thunder Client ou diretamente pe
     }
     ```
 
-4. Criar Projeto
+6. Criar Projeto
 
    POST /api/projetos
 
