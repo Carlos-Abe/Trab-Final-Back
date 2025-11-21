@@ -112,4 +112,76 @@ router.post('/', async (req, res) => {
     };
 });
 
+// Rota para atualizar usuário por ID
+router.put('/:id', async (req, res) => {
+    try {
+        const { nome, email, senha, perfil } = req.body;
+
+        // Validação mínima (opcional, você pode ajustar)
+        if (!nome && !email && !senha && !perfil) {
+            return res.status(400).json({ erro: 'É necessário fornecer pelo menos um campo para atualizar' });
+        }
+
+        // Busca o usuário pelo ID
+        const usuario = await Usuario.findById(req.params.id);
+        if (!usuario) {
+            return res.status(404).json({ erro: 'Usuário não encontrado' });
+        }
+
+        // Atualiza os campos se fornecidos
+        if (nome) usuario.nome = nome;
+        if (email) usuario.email = email;
+        if (perfil) usuario.perfil = perfil;
+        if (senha) {
+            const bcrypt = require('bcrypt');
+            const salt = await bcrypt.genSalt(10);
+            usuario.senha = await bcrypt.hash(senha, salt);
+        }
+
+        const usuarioAtualizado = await usuario.save();
+
+        // Retorna o usuário atualizado sem a senha
+        const { senha: _, ...usuarioSemSenha } = usuarioAtualizado.toObject();
+
+        res.status(200).json({
+            mensagem: 'Usuário atualizado com sucesso',
+            usuario: usuarioSemSenha
+        });
+
+    } catch (err) {
+        if (err.name === 'CastError') {
+            return res.status(400).json({ erro: 'ID inválido' });
+        }
+        if (err.code === 11000) {
+            return res.status(400).json({ erro: 'E-mail já cadastrado' });
+        }
+        res.status(500).json({
+            erro: 'Erro ao atualizar usuário',
+            detalhes: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+});
+
+// Rota para deletar usuário por ID
+router.delete('/:id', async (req, res) => {
+    try {
+        const usuario = await Usuario.findByIdAndDelete(req.params.id);
+
+        if (!usuario) {
+            return res.status(404).json({ erro: 'Usuário não encontrado' });
+        }
+
+        res.status(200).json({ mensagem: 'Usuário deletado com sucesso' });
+
+    } catch (err) {
+        if (err.name === 'CastError') {
+            return res.status(400).json({ erro: 'ID inválido' });
+        }
+        res.status(500).json({ 
+            erro: 'Erro ao deletar usuário',
+            detalhes: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+});
+
 module.exports = router;

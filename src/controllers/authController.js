@@ -1,6 +1,6 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs'); // ALTERAÇÃO: bcryptjs
 const Usuario = require('../models/usuarioModel');
 
 async function registrar(req, res) {
@@ -27,14 +27,11 @@ async function registrar(req, res) {
       });
     }
 
-    // Criptografa a senha (o middleware do modelo também fará isso, mas fazemos aqui para segurança)
-    const senhaCriptografada = await bcrypt.hash(senha, 12);
-
-    // Cria o usuário
+    // Não criptografa a senha aqui! O model faz isso (pre-save) // ALTERAÇÃO
     const novoUsuario = await Usuario.create({ 
       nome, 
       email, 
-      senha: senhaCriptografada, 
+      senha, // ALTERAÇÃO: senha normal, o model faz hash
       perfil 
     });
 
@@ -50,7 +47,7 @@ async function registrar(req, res) {
     res.status(201).json({
       message: 'Usuário registrado com sucesso',
       token,
-      usuario: novoUsuario // Já vem sem a senha devido ao toJSON()
+      usuario: novoUsuario
     });
 
   } catch (err) {
@@ -88,14 +85,18 @@ async function login(req, res) {
       });
     }
 
-    // Busca usuário incluindo a senha (já que o toJSON() remove)
-    const usuario = await Usuario.findOne({ email }).select('+senha');
+    // Busca usuário **normal**, senha já vem (não usar .select) // ALTERAÇÃO
+    const usuario = await Usuario.findOne({ email });
     
     if (!usuario) {
       return res.status(404).json({ 
         erro: 'Usuário não encontrado' 
       });
     }
+
+    // Log para depuração (opcional) // ALTERAÇÃO
+    // console.log('Senha digitada:', senha);
+    // console.log('Hash no banco:', usuario.senha);
 
     // Usa o método do modelo para comparar senhas
     const senhaValida = await usuario.compararSenha(senha);
@@ -114,13 +115,11 @@ async function login(req, res) {
       expiresIn: '1d' 
     });
 
-    // Busca o usuário novamente sem a senha para retornar
-    const usuarioSemSenha = await Usuario.findById(usuario._id);
-
+    // Retorna o usuário sem a senha (o toJSON do model já remove)
     res.json({ 
       message: 'Login realizado com sucesso',
       token,
-      usuario: usuarioSemSenha
+      usuario
     });
 
   } catch (err) {
