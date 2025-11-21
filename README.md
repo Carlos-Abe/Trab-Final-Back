@@ -107,7 +107,7 @@ A FreeTech API possui testes automatizados implementados com Jest e Supertest, g
 
 ## usuário
 ### Registrar Usuário
-    POST /api/usuarios/registrar
+    POST /api/auth/registrar
 
 ### Login (gera token JWT)
     POST /api/usuarios/login
@@ -416,7 +416,7 @@ Eles podem ser utilizados no Postman, Insomnia, Thunder Client ou diretamente pe
    {
         "nome": "Lucas Pereira",
         "area": "Desenvolvedor Fullstack",
-        "disponibilidade": "Integral",
+        "disponibilidade": "disponível",
         "nota": 4.8
     }
    ```
@@ -428,7 +428,7 @@ Eles podem ser utilizados no Postman, Insomnia, Thunder Client ou diretamente pe
             "_id": "6759c0102abc2",
             "nome": "Lucas Pereira",
             "area": "Desenvolvedor Fullstack",
-            "disponibilidade": "Integral",
+            "disponibilidade": "disponível",
             "nota": 4.8
         }
     }
