@@ -3,6 +3,7 @@ const router = express.Router();
 const Usuario = require('../models/usuarioModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const autenticarToken = require('../middlewares/authMiddleware');
 
 // Rota de login
 router.post('/login', async (req, res) => {
@@ -163,7 +164,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Rota para deletar usuário por ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', autenticarToken, async (req, res) => {
     try {
         const usuario = await Usuario.findByIdAndDelete(req.params.id);
 
